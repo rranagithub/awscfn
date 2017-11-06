@@ -3,7 +3,6 @@
   "Description": "AWS CloudFormation Template VPC_Single_Instance_In_Subnet_with_Apache",
   "Parameters": {
     "InstanceType": {
-	"KeyName":"",
       "Description": "WebServer EC2 instance type",
       "Type": "String",
       "Default": "t2.micro",
