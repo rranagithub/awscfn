@@ -75,7 +75,7 @@
         "SubnetId": {
 			"Description": "Subnet ID.",
 			"Type": "String",
-			"Default": "subnet-c60e718f"
+			"Default": {"default":"SubnetId"}
 		
 	
 		},	
@@ -89,7 +89,7 @@
 		"KeyName": {
 			"Description": "Key Name for EC2.",
 			"Type": "String",
-			"Default": "management",
+			"Default": "myCFNKeyPair",
 			
 			"ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x and subnet of pVpc."
 		},	
@@ -131,9 +131,9 @@
       "ImageId" : { "Ref" : "ImageId" },
       "InstanceType" : { "Ref" : "InstanceType" },
       "KeyName" : { "Ref" : "KeyName" },
-      "SecurityGroupIds" : ["sg-78108601"],
+      "SecurityGroupIds" : {"default":"SecurityGroupIds"},
       "SubnetId" : { "Ref" : "SubnetId" },
-      "Tags" : [ {"Key": "Name", "Value": "JenkinsServer"},
+      "Tags" : [ {"Key": "Name", "Value": "myCFN-EC2"},
 	  {"Key": "Dept", "Value": {"Ref": "Tag1"}},
 				 {"Key": "Environment","Value": {"Ref": "Tag2"}},
                  {"Key": "CostCenter","Value": {"Ref": "Tag3"} },
