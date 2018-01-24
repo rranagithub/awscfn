@@ -6,7 +6,7 @@
   "Parameters" : {
     "KeyName" : {
       "Description" : "Name of an existing EC2 KeyPair",
-      "Type" : "AWS::EC2::KeyPair::KeyName",
+      "Type" : "AWS::EC2::KeyPair::MyRocheKey",
       "ConstraintDescription" : "must be the name of an existing EC2 KeyPair."
     },
 
@@ -32,21 +32,6 @@
       "MaxLength" : "15",
       "AllowedPattern" : "[a-zA-Z0-9]+"
     },   
-    "RestoreModePassword" : {
-      "Description" : "Password for a separate Administrator account when the domain controller is in Restore Mode. Must be at least 8 characters containing letters, numbers and symbols",
-      "Type" : "String",
-      "MinLength" : "8",
-      "MaxLength" : "32",
-      "AllowedPattern" : "(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*",
-      "NoEcho" : "True"
-    },
-    "SourceCidrForRDP" : {
-      "Description" : "IP Cidr from which you are likely to RDP into the instances. You can add rules later by modifying the created security groups e.g. 54.32.98.160/32",
-      "Type" : "String",
-      "MinLength" : "9",
-      "MaxLength" : "18",
-      "AllowedPattern" : "^([0-9]+\\.){3}[0-9]+\\/[0-9]+$"
-    }
   },
 
   "Mappings" : {
@@ -101,27 +86,7 @@
                 "content" : "%~1\nIF %ERRORLEVEL% GTR 10 ( exit /b 1 ) else ( exit /b 0 )"
               }
             },
-        
-            "commands" : {
-              "1-run-dcpromo" : {
-                "command" : { "Fn::Join" : [ "", [
-                  "C:\\cfn\\RunCommand.bat \"dcpromo /unattend  /ReplicaOrNewDomain:Domain  /NewDomain:Forest  /NewDomainDNSName:",
-                  { "Ref" : "DomainDNSName" },
-                  "  /ForestLevel:4 /DomainNetbiosName:",
-                  { "Ref" : "DomainNetBIOSName" },
-                  " /DomainLevel:4  /InstallDNS:Yes  /ConfirmGc:Yes  /CreateDNSDelegation:No  /DatabasePath:\"C:\\Windows\\NTDS\"  /LogPath:\"C:\\Windows\\NTDS\"  /SYSVOLPath:\"C:\\Windows\\SYSVOL\" /SafeModeAdminPassword=", 
-                  { "Ref" : "RestoreModePassword" }, 
-                  " /RebootOnCompletion:Yes\"" 
-                  ]]},
-                "waitAfterCompletion" : "forever"
-              },
-              "2-signal-success" : { 
-                "command" : { "Fn::Join" : ["", [ 
-                  "cfn-signal.exe -e 0 \"", { "Fn::Base64" : { "Ref" : "DomainControllerWaitHandle" } },"\"" ]]
-                }
-              }
-            },
-            
+			
             "services" : {
               "windows" : {
                 "cfn-hup" : {
@@ -215,10 +180,6 @@
     "DomainControllerIP" : {
       "Value" : { "Fn::GetAtt" : [ "DomainController", "PrivateIp" ] },
       "Description" : "Private IP address of Active Directory server which is also a DNS server"
-    },
-    "DomainAdmin" : {
-      "Value" : { "Fn::Join" : ["", [{ "Ref" : "DomainNetBIOSName" }, "\\Administrator" ]] },
-      "Description" : "Default domain administrator account"
     },
     "DomainAdminPassword" : {
       "Value" : "Please retrieve Administrator password of the instance"
